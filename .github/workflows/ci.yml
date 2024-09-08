@@ -6,13 +6,27 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-20.04
-    env:
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3307:3306  # 3307 포트를 사용
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: oz_django
 
+    env:
       DB_HOST: 127.0.0.1
-      DB_PORT: 3307
+      DB_PORT: 3307  # DB 포트 설정
       DB_USER: root
-      DB_PASSWORD: 1234
+      DB_PASSWORD: root
       DB_DATABASE: oz_django
+
     steps:
       - name: Check out the codes
         uses: actions/checkout@v2
@@ -22,19 +36,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.12
-
-      - name: Set timezone to KST
-        run: |
-          sudo rm /etc/localtime
-          sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
-
-      # Start Mysql
-      # https://ovirium.com/blog/how-to-make-mysql-work-in-your-github-actions/
-      - name: Start Mysql
-        run: |
-          sudo systemctl start mysql
-          mysql -e "use mysql; FLUSH PRIVILEGES; ALTER USER '${{ env.DB_USER }}'@'localhost' IDENTIFIED BY '${{ env.DB_PASSWORD }}';" -uroot -proot
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
 
       - name: Install Poetry
         run: |
@@ -60,4 +61,3 @@ jobs:
       - name: Test python project
         run: |
           poetry run python manage.py test
-
