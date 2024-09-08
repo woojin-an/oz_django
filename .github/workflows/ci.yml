@@ -9,7 +9,7 @@ jobs:
     env:
 
       DB_HOST: 127.0.0.1
-      DB_PORT: 3306
+      DB_PORT: 3307
       DB_USER: root
       DB_PASSWORD: 1234
       DB_DATABASE: oz_django
