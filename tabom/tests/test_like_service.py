@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.test import TestCase
 
 from tabom.models import Article, User
@@ -6,14 +7,14 @@ from tabom.services.like_service import do_like
 
 class TestLikeService(TestCase):
     def test_a_user_can_like_an_article(self) -> None:
-        # Given
+        # Given -> 무슨 상황에서? 테스트 대상
         user = User.objects.create(name="test")
         article = Article.objects.create(title="test_title")
 
-        # When
+        # When -> 테스트 상황, 함수
         like = do_like(user.id, article.id)
 
-        # Then
+        # Then -> 테스트 결과 검증
         self.assertIsNotNone(like.id)
         self.assertEqual(user.id, like.user_id)
         self.assertEqual(article.id, like.article_id)
@@ -23,7 +24,7 @@ class TestLikeService(TestCase):
         user = User.objects.create(name="test")
         article = Article.objects.create(title="test_title")
 
-        # Expect
-        like1 = do_like(user.id, article.id)
-        with self.assertRaises(Exception):
-            like2 = do_like(user.id, article.id)
+        # Expect (when then을 나누기 애매할 때)
+        do_like(user.id, article.id)
+        with self.assertRaises(IntegrityError):
+            do_like(user.id, article.id)
