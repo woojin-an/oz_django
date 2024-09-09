@@ -46,3 +46,15 @@ class TestLikeService(TestCase):
         # Except
         with self.assertRaises(IntegrityError):
             do_like(user.id, invalid_article_id)
+
+    def test_like_count_should_increase(self) -> None:
+        # Given
+        user = User.objects.create(name="test")
+        article = Article.objects.create(title="test_title")
+
+        # When
+        do_like(user.id, article.id)
+
+        # Then
+        article = Article.objects.get(id=article.id)
+        self.assertEqual(1, article.like_set.count())
