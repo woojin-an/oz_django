@@ -6,6 +6,16 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-20.04
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: 1234
+          MYSQL_DATABASE: oz_django
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+        ports:
+          - 3307:3306
     env:
 
       DB_HOST: 127.0.0.1
